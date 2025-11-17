@@ -2,6 +2,102 @@
 // UI UPDATE & RENDERING
 // ============================================================================
 
+// ========================================
+// HIDDEN CHEAT COMMANDS
+// ========================================
+
+// Secret cheat: Type 'godmode()' in console to become unstoppable!
+window.godmode = function() {
+    if (!game) {
+        console.log('Game not loaded yet!');
+        return;
+    }
+    
+    // Massive boost to all stats
+    game.xp = game.xpForNextLevel * 100;
+    game.level = 100;
+    game.currency = 1000000;
+    game.clickXp = 500;
+    game.passiveXp = 1000;
+    game.rebirthMultiplier = 5;
+    
+    // Unlock all upgrades
+    UPGRADES.forEach(u => {
+        game.upgrades[u.id] = { level: 50, purchased: true };
+    });
+    
+    // Boost skills
+    Object.keys(game.skills).forEach(skillName => {
+        game.skillCooldowns[skillName] = 0;
+        game.skills[skillName].isReady = true;
+        game.skills[skillName].power *= 10;
+    });
+    
+    game.save();
+    updateUI();
+    console.log('✨ GOD MODE ACTIVATED! You are now unstoppable! ✨');
+};
+
+// Easter egg: Type 'ascend()' for a mega rebirth
+window.ascend = function() {
+    if (!game) {
+        console.log('Game not loaded yet!');
+        return;
+    }
+    
+    game.rebirthCount += 10;
+    game.rebirthMultiplier = game.getRebirthMultiplier();
+    console.log('✨ You have ascended! ' + game.rebirthCount + ' total rebirths. ✨');
+    game.save();
+};
+
+// Type 'richman()' to get infinite currency
+window.richman = function() {
+    if (!game) {
+        console.log('Game not loaded yet!');
+        return;
+    }
+    
+    game.currency = 999999999;
+    game.save();
+    updateUI();
+    console.log('💰 YOU ARE NOW FILTHY RICH! 💰');
+};
+
+// Type 'speedrun()' to max out your character instantly
+window.speedrun = function() {
+    if (!game) {
+        console.log('Game not loaded yet!');
+        return;
+    }
+    
+    game.level = 1000;
+    game.xp = 0;
+    game.xpForNextLevel = 100 * Math.pow(1.1, 999);
+    game.currency = 100000000;
+    game.clickXp = 10000;
+    game.passiveXp = 10000;
+    game.skillMultiplier = 50;
+    game.cooldownMultiplier = 50;
+    game.rebirthMultiplier = 20;
+    game.rebirthCount = 200;
+    
+    UPGRADES.forEach(u => {
+        game.upgrades[u.id] = { level: 100, purchased: true };
+    });
+    
+    game.save();
+    updateUI();
+    console.log('🚀 SPEEDRUN MODE ACTIVATED! You are level 1000! 🚀');
+};
+
+console.log('%c🎮 ASCENSION IDLE DEBUG CONSOLE', 'color: #6366f1; font-size: 16px; font-weight: bold;');
+console.log('%cSecret commands available:', 'color: #ec4899; font-weight: bold;');
+console.log('%cgodmode() - Become unstoppable!', 'color: #10b981;');
+console.log('%crichman() - Get infinite currency', 'color: #f59e0b;');
+console.log('%cascend() - Jump 10 rebirths ahead', 'color: #a855f7;');
+console.log('%cspeedrun() - Max out your character instantly', 'color: #ef4444;');
+
 function updateUI() {
     if (!game) return;
 
