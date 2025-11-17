@@ -28,6 +28,24 @@ window.ascend = function() { if (!game) return; game.rebirthCount += 10; game.re
 window.richman = function() { if (!game) return; game.currency = 999999999; game.save(); updateUI(); };
 window.speedrun = function() { if (!game) return; game.level = 1000; game.xp = 0; game.xpForNextLevel = 100 * Math.pow(1.1, 999); game.currency = 100000000; game.clickXp = 10000; game.passiveXp = 10000; game.skillMultiplier = 50; game.cooldownMultiplier = 50; game.rebirthMultiplier = 20; game.rebirthCount = 200; UPGRADES.forEach(u => { game.upgrades[u.id] = { level: 100, purchased: true }; }); game.save(); updateUI(); };
 
+// A short console message (as requested)
+console.log("You know Ethan doesn't like cheaters");
+
+// Hidden wipe function: call `wipeSave()` in the console to remove save and reload.
+window.wipeSave = function() {
+    try {
+        if (!confirm('Wipe all save data? This cannot be undone.')) return;
+        localStorage.removeItem('idleGameSave');
+        // also gracefully reset in-memory game if present
+        if (window.game) {
+            // attempt to clear current game state then reload
+            window.game = null;
+        }
+        location.reload();
+    } catch (e) {
+        console.error('Failed to wipe save:', e);
+    }
+};
 function updateUI() {
     if (!game) return;
 
