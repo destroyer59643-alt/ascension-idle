@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Idle Incremental Game</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1>⚔️ Idle Incremental</h1>
+            <div class="rebirth-counter">
+                <span>Rebirths: <strong id="rebirthCount">0</strong></span>
+            </div>
+        </header>
+
+        <!-- Main Game Area -->
+        <main class="game-area">
+            <!-- Left Panel: Stats & Clicking -->
+            <div class="left-panel">
+                <!-- Stats Display -->
+                <div class="stats-panel">
+                    <div class="stat">
+                        <span class="stat-label">Level</span>
+                        <span class="stat-value" id="levelDisplay">1</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-label">XP</span>
+                        <span class="stat-value" id="xpDisplay">0</span>
+                    </div>
+                    <div class="xp-bar">
+                        <div class="xp-bar-fill" id="xpBar"></div>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-label">Next Level In</span>
+                        <span class="stat-value" id="xpToNextLevel">100</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-label">Currency</span>
+                        <span class="stat-value currency" id="currencyDisplay">0</span>
+                    </div>
+                </div>
+
+                <!-- Class Display -->
+                <div class="class-panel">
+                    <div class="stat-label">Active Class</div>
+                    <div class="class-display" id="classDisplay">Warrior</div>
+                    <div class="class-perks" id="classPerks"></div>
+                </div>
+
+                <!-- Click Button -->
+                <div class="click-section">
+                    <button class="click-btn" id="clickBtn">
+                        <span class="click-text">CLICK!</span>
+                        <span class="click-xp" id="clickXpDisplay">+10 XP</span>
+                    </button>
+                    <div class="click-info">
+                        <small id="clickXpInfo">+10 XP per click</small>
+                    </div>
+                </div>
+
+                <!-- Passive XP Display -->
+                <div class="passive-section">
+                    <span class="passive-label">Passive XP/sec:</span>
+                    <span class="passive-value" id="passiveXpDisplay">0</span>
+                </div>
+            </div>
+
+            <!-- Right Panel: Tabs -->
+            <div class="right-panel">
+                <!-- Tab Navigation -->
+                <div class="tab-nav">
+                    <button class="tab-btn active" data-tab="skills">⚡ Skills</button>
+                    <button class="tab-btn" data-tab="upgrades">📈 Upgrades</button>
+                    <button class="tab-btn" data-tab="shop">🛍️ Shop</button>
+                    <button class="tab-btn" data-tab="rebirth">🔄 Rebirth</button>
+                </div>
+
+                <!-- Skills Tab -->
+                <div class="tab-content active" id="skills-tab">
+                    <div class="tab-title">Active Skills</div>
+                    <div class="skills-list" id="skillsList"></div>
+                </div>
+
+                <!-- Upgrades Tab -->
+                <div class="tab-content" id="upgrades-tab">
+                    <div class="tab-title">Upgrades</div>
+                    <div class="upgrades-list" id="upgradesList"></div>
+                </div>
+
+                <!-- Shop Tab -->
+                <div class="tab-content" id="shop-tab">
+                    <div class="tab-title">Shop</div>
+                    <div class="shop-list" id="shopList"></div>
+                </div>
+
+                <!-- Rebirth Tab -->
+                <div class="tab-content" id="rebirth-tab">
+                    <div class="rebirth-content">
+                        <div class="rebirth-info">
+                            <p>Rebirthing will:</p>
+                            <ul>
+                                <li>Reset your Level & XP</li>
+                                <li>Reset your upgrades</li>
+                                <li>Give you permanent multipliers</li>
+                                <li>Let you choose a new class</li>
+                            </ul>
+                            <div class="rebirth-multiplier">
+                                <strong>Next Rebirth Multiplier:</strong>
+                                <span id="rebirthMultiplier">1.1x</span>
+                            </div>
+                        </div>
+                        <button class="rebirth-btn" id="rebirthBtn">🔄 Rebirth Now</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Class Selection Modal -->
+        <div class="modal" id="classModal">
+            <div class="modal-content">
+                <h2>Choose Your Class</h2>
+                <div class="class-options" id="classOptions"></div>
+            </div>
+        </div>
+
+        <!-- Notifications -->
+        <div class="notifications" id="notifications"></div>
+    </div>
+
+    <script src="game.js"></script>
+    <script src="ui.js"></script>
+</body>
+</html>
