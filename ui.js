@@ -301,6 +301,8 @@ function updateRebirthTab() {
 // CLASS MODAL
 // ========================================
 
+let selectedClassTemp = null;
+
 function initializeClassModal() {
     const classOptions = document.getElementById('classOptions');
     classOptions.innerHTML = '';
@@ -316,13 +318,27 @@ function initializeClassModal() {
         `;
 
         option.addEventListener('click', () => {
+            // Remove selected from all options
             document.querySelectorAll('.class-option').forEach(el => el.classList.remove('selected'));
+            // Add selected to clicked option
             option.classList.add('selected');
-            game.selectClass(key);
+            // Store temp selection
+            selectedClassTemp = key;
+            // Show confirm button
+            document.getElementById('selectedClassName').textContent = classData.name;
+            document.getElementById('confirmSection').style.display = 'block';
         });
 
         classOptions.appendChild(option);
     });
+}
+
+function confirmClassSelection() {
+    if (selectedClassTemp) {
+        game.selectClass(selectedClassTemp);
+        selectedClassTemp = null;
+        document.getElementById('confirmSection').style.display = 'none';
+    }
 }
 
 // ========================================
@@ -406,6 +422,12 @@ document.addEventListener('DOMContentLoaded', () => {
     initializeClassModal();
     initializeTabSwitching();
     initializeEventListeners();
+
+    // Confirm class button
+    const confirmClassBtn = document.getElementById('confirmClassBtn');
+    if (confirmClassBtn) {
+        confirmClassBtn.addEventListener('click', confirmClassSelection);
+    }
 
     // Initial UI update
     setTimeout(() => {
