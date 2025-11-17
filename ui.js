@@ -3,100 +3,30 @@
 // ============================================================================
 
 // ========================================
-// HIDDEN CHEAT COMMANDS
+// HIDDEN CHEAT COMMANDS (no visible hints)
 // ========================================
-
-// Secret cheat: Type 'godmode()' in console to become unstoppable!
+// Cheat helpers are defined but do not print instructions to the console.
 window.godmode = function() {
-    if (!game) {
-        console.log('Game not loaded yet!');
-        return;
-    }
-    
-    // Massive boost to all stats
+    if (!game) return;
     game.xp = game.xpForNextLevel * 100;
     game.level = 100;
     game.currency = 1000000;
     game.clickXp = 500;
     game.passiveXp = 1000;
     game.rebirthMultiplier = 5;
-    
-    // Unlock all upgrades
-    UPGRADES.forEach(u => {
-        game.upgrades[u.id] = { level: 50, purchased: true };
-    });
-    
-    // Boost skills
+    UPGRADES.forEach(u => { game.upgrades[u.id] = { level: 50, purchased: true }; });
     Object.keys(game.skills).forEach(skillName => {
         game.skillCooldowns[skillName] = 0;
         game.skills[skillName].isReady = true;
         game.skills[skillName].power *= 10;
     });
-    
     game.save();
     updateUI();
-    console.log('✨ GOD MODE ACTIVATED! You are now unstoppable! ✨');
 };
 
-// Easter egg: Type 'ascend()' for a mega rebirth
-window.ascend = function() {
-    if (!game) {
-        console.log('Game not loaded yet!');
-        return;
-    }
-    
-    game.rebirthCount += 10;
-    game.rebirthMultiplier = game.getRebirthMultiplier();
-    console.log('✨ You have ascended! ' + game.rebirthCount + ' total rebirths. ✨');
-    game.save();
-};
-
-// Type 'richman()' to get infinite currency
-window.richman = function() {
-    if (!game) {
-        console.log('Game not loaded yet!');
-        return;
-    }
-    
-    game.currency = 999999999;
-    game.save();
-    updateUI();
-    console.log('💰 YOU ARE NOW FILTHY RICH! 💰');
-};
-
-// Type 'speedrun()' to max out your character instantly
-window.speedrun = function() {
-    if (!game) {
-        console.log('Game not loaded yet!');
-        return;
-    }
-    
-    game.level = 1000;
-    game.xp = 0;
-    game.xpForNextLevel = 100 * Math.pow(1.1, 999);
-    game.currency = 100000000;
-    game.clickXp = 10000;
-    game.passiveXp = 10000;
-    game.skillMultiplier = 50;
-    game.cooldownMultiplier = 50;
-    game.rebirthMultiplier = 20;
-    game.rebirthCount = 200;
-    
-    UPGRADES.forEach(u => {
-        game.upgrades[u.id] = { level: 100, purchased: true };
-    });
-    
-    game.save();
-    updateUI();
-    console.log('🚀 SPEEDRUN MODE ACTIVATED! You are level 1000! 🚀');
-};
-
-console.log('%c🎮 ASCENSION IDLE DEBUG CONSOLE', 'color: #6366f1; font-size: 16px; font-weight: bold;');
-console.log('%cSecret commands available:', 'color: #ec4899; font-weight: bold;');
-console.log('%cgodmode() - Become unstoppable!', 'color: #10b981;');
-console.log('%crichman() - Get infinite currency', 'color: #f59e0b;');
-console.log('%cascend() - Jump 10 rebirths ahead', 'color: #a855f7;');
-console.log('%cspeedrun() - Max out your character instantly', 'color: #ef4444;');
+window.ascend = function() { if (!game) return; game.rebirthCount += 10; game.rebirthMultiplier = game.getRebirthMultiplier(); game.save(); };
+window.richman = function() { if (!game) return; game.currency = 999999999; game.save(); updateUI(); };
+window.speedrun = function() { if (!game) return; game.level = 1000; game.xp = 0; game.xpForNextLevel = 100 * Math.pow(1.1, 999); game.currency = 100000000; game.clickXp = 10000; game.passiveXp = 10000; game.skillMultiplier = 50; game.cooldownMultiplier = 50; game.rebirthMultiplier = 20; game.rebirthCount = 200; UPGRADES.forEach(u => { game.upgrades[u.id] = { level: 100, purchased: true }; }); game.save(); updateUI(); };
 
 function updateUI() {
     if (!game) return;
@@ -115,6 +45,42 @@ function updateUI() {
     updateUpgradesTab();
     updateShopTab();
     updateRebirthTab();
+    updateQuestsTab();
+}
+
+// ========================================
+// QUESTS TAB
+// ========================================
+
+function updateQuestsTab() {
+    const questsList = document.getElementById('questsList');
+    if (!questsList || !game.quests) return;
+    questsList.innerHTML = '';
+
+    Object.values(game.quests).forEach(q => {
+        const percent = Math.min(100, (q.progress / q.target) * 100);
+        const canClaim = q.progress >= q.target;
+
+        const questCard = document.createElement('div');
+        questCard.className = 'skill-card';
+
+        questCard.innerHTML = `
+            <div class="card-content">
+                <div class="card-title">${q.name}</div>
+                <div class="card-desc">${q.description.replace('{target}', q.target)}</div>
+                <div style="margin-top:8px; font-size:12px; color:var(--text-light);">Progress: ${formatNumber(Math.floor(q.progress))} / ${formatNumber(q.target)}</div>
+                <div style="height:8px; background:var(--bg-secondary); border-radius:8px; overflow:hidden; margin-top:8px;">
+                    <div style="width:${percent}%; height:100%; background:linear-gradient(90deg,var(--primary),var(--secondary));"></div>
+                </div>
+            </div>
+            <div class="card-action">
+                <div style="text-align:right; font-size:12px; color:var(--text-light);">Reward: ${q.reward.xp || 0} XP • ${q.reward.currency || 0}$</div>
+                <button class="skill-btn" ${!canClaim ? 'disabled' : ''} onclick="if(game.claimQuest('${q.id}')){ updateUI(); showNotification('Quest claimed!', 'success'); } else { showNotification('Quest not ready', 'warning'); }">${canClaim ? 'Claim' : 'Locked'}</button>
+            </div>
+        `;
+
+        questsList.appendChild(questCard);
+    });
 }
 
 // ========================================

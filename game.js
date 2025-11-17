@@ -124,6 +124,36 @@ const SHOP_ITEMS = [
     },
 ];
 
+const QUEST_TEMPLATES = [
+    {
+        id: 'earnXp',
+        name: 'Earn XP',
+        description: 'Earn {target} XP',
+        condition: 'xp',
+        baseTarget: 100,
+        reward: { currency: 10, xp: 50 },
+        multiplier: 1.5,
+    },
+    {
+        id: 'clicks',
+        name: 'Click Mastery',
+        description: 'Click {target} times',
+        condition: 'clicks',
+        baseTarget: 50,
+        reward: { currency: 20, xp: 20 },
+        multiplier: 1.6,
+    },
+    {
+        id: 'reachLevel',
+        name: 'Ascend to Level',
+        description: 'Reach level {target}',
+        condition: 'level',
+        baseTarget: 5,
+        reward: { currency: 50, xp: 200 },
+        multiplier: 2,
+    },
+];
+
 // ============================================================================
 // MAIN GAME CLASS
 // ============================================================================
@@ -163,8 +193,17 @@ class IdleGame {
         // Boosters
         this.boosters = [];
 
+        // Click tracking
+        this.clickCount = 0;
+
+        // Quests
+        this.quests = {};
+
         // Load from storage
         this.load();
+
+        // Initialize quests if needed
+        this.initQuests();
 
         // Show class selection if needed
         if (!this.selectedClass) {
@@ -173,6 +212,68 @@ class IdleGame {
 
         // Initialize game loop
         this.startGameLoop();
+    }
+
+    // ========================================
+    // QUESTS
+    // ========================================
+
+    initQuests() {
+        if (!this.quests || Object.keys(this.quests).length === 0) {
+            this.quests = {};
+            QUEST_TEMPLATES.forEach(t => {
+                this.quests[t.id] = {
+                    id: t.id,
+                    name: t.name,
+                    description: t.description,
+                    condition: t.condition,
+                    target: t.baseTarget,
+                    progress: 0,
+                    reward: Object.assign({}, t.reward),
+                    multiplier: t.multiplier,
+                    completed: 0,
+                };
+            });
+            this.save();
+        }
+    }
+
+    updateQuests(type, amount) {
+        Object.values(this.quests).forEach(q => {
+            if (q.condition === 'xp' && type === 'xp') {
+                q.progress += amount;
+            }
+            if (q.condition === 'clicks' && type === 'click') {
+                q.progress += amount;
+            }
+            if (q.condition === 'level' && type === 'level') {
+                // for level quests, progress stores the current reached level
+                q.progress = Math.max(q.progress, this.level);
+            }
+        });
+        this.save();
+    }
+
+    claimQuest(questId) {
+        const q = this.quests[questId];
+        if (!q) return false;
+        if (q.progress < q.target) return false;
+
+        // Give rewards
+        if (q.reward.currency) this.currency += q.reward.currency;
+        if (q.reward.xp) this.addXp(q.reward.xp);
+
+        q.completed++;
+
+        // Multiply target and reward for next iteration
+        q.target = Math.ceil(q.target * q.multiplier);
+        q.reward.currency = Math.ceil((q.reward.currency || 0) * q.multiplier);
+        q.reward.xp = Math.ceil((q.reward.xp || 0) * q.multiplier);
+
+        // Reset progress
+        q.progress = 0;
+        this.save();
+        return true;
     }
 
     // ========================================
@@ -239,6 +340,9 @@ class IdleGame {
         baseXp *= this.xpMultiplier;
 
         this.addXp(baseXp);
+        // Track clicks for quests
+        this.clickCount = (this.clickCount || 0) + 1;
+        this.updateQuests('click', 1);
         return baseXp;
     }
 
@@ -249,6 +353,9 @@ class IdleGame {
         while (this.xp >= this.xpForNextLevel) {
             this.levelUp();
         }
+
+        // Update XP quests
+        this.updateQuests('xp', amount);
 
         this.save();
     }
@@ -265,6 +372,8 @@ class IdleGame {
         this.currency += currencyGain;
 
         showNotification(`Level ${this.level}! +${currencyGain} currency`, 'success');
+        // Update level quests
+        this.updateQuests('level', this.level);
         this.save();
     }
 
@@ -546,6 +655,9 @@ class IdleGame {
             upgrades: this.upgrades,
             skills: this.skills,
             skillCooldowns: this.skillCooldowns,
+            clickCount: this.clickCount,
+            quests: this.quests,
+            boosters: this.boosters,
         };
         localStorage.setItem('idleGameSave', JSON.stringify(data));
     }
@@ -569,6 +681,9 @@ class IdleGame {
         this.upgrades = data.upgrades;
         this.skills = data.skills || {};
         this.skillCooldowns = data.skillCooldowns || {};
+        this.clickCount = data.clickCount || 0;
+        this.quests = data.quests || {};
+        this.boosters = data.boosters || [];
 
         // Re-initialize skills if class is selected
         if (this.selectedClass && Object.keys(this.skills).length === 0) {

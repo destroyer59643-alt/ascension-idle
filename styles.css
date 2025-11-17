@@ -208,12 +208,11 @@ body {
 }
 
 .click-btn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.6);
+    box-shadow: 0 8px 30px rgba(16, 185, 129, 0.6);
 }
 
 .click-btn:active {
-    transform: translateY(-1px) scale(0.98);
+    transform: scale(0.99);
 }
 
 .click-text {
@@ -254,8 +253,8 @@ body {
 
 /* Passive Section */
 .passive-section {
-    background: linear-gradient(135deg, #c084fc 0%, #a855f7 100%);
-    color: white;
+    background: linear-gradient(135deg, var(--bg-tertiary) 0%, rgba(52,65,85,0.9) 100%);
+    color: var(--text);
     padding: 15px;
     border-radius: 8px;
     display: flex;
@@ -312,7 +311,7 @@ body {
 }
 
 .tab-btn:hover {
-    background: #f3f4f6;
+    background: var(--bg-tertiary);
 }
 
 /* Tab Content */
@@ -368,7 +367,7 @@ body {
 .upgrade-card:hover,
 .shop-item:hover {
     border-color: var(--primary);
-    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.1);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.6);
 }
 
 .card-content {
@@ -419,8 +418,7 @@ body {
 .upgrade-btn:hover,
 .shop-btn:hover {
     background: var(--primary-dark);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(99, 102, 241, 0.3);
+    box-shadow: 0 6px 14px rgba(0,0,0,0.6);
 }
 
 .skill-btn:disabled,
@@ -529,12 +527,11 @@ body {
 }
 
 .rebirth-btn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 20px rgba(239, 68, 68, 0.5);
+    box-shadow: 0 8px 28px rgba(239, 68, 68, 0.5);
 }
 
 .rebirth-btn:active {
-    transform: translateY(-1px) scale(0.98);
+    transform: scale(0.99);
 }
 
 /* Modal */
@@ -602,8 +599,7 @@ body {
 
 .class-option:hover {
     border-color: var(--primary);
-    transform: translateY(-3px);
-    box-shadow: 0 8px 16px rgba(99, 102, 241, 0.3);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.6);
     background: var(--bg-tertiary);
 }
 
@@ -750,14 +746,14 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-    background: #f1f5f9;
+    background: #0b0b0b;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: var(--primary);
+    background: #4b5563;
     border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: var(--primary-dark);
+    background: #6b7280;
 }
