@@ -204,6 +204,19 @@ function updateSkillsTab() {
         skillCard.addEventListener('pointerenter', () => skillCard.classList.add('hovered'));
         skillCard.addEventListener('pointerleave', () => skillCard.classList.remove('hovered'));
 
+        // ensure the button inside the card also maintains the hovered state
+        const skillBtn = skillCard.querySelector('.skill-btn');
+        if (skillBtn) {
+            skillBtn.addEventListener('pointerenter', () => skillCard.classList.add('hovered'));
+            skillBtn.addEventListener('pointerleave', (e) => {
+                // only remove hovered if pointer actually left the card
+                const related = e.relatedTarget;
+                if (!related || !skillCard.contains(related)) {
+                    skillCard.classList.remove('hovered');
+                }
+            });
+        }
+
         // restore hovered state if this card was hovered before rebuild
         if (prevHoveredSkill && prevHoveredSkill === skillName) {
             skillCard.classList.add('hovered');
@@ -255,6 +268,18 @@ function updateUpgradesTab() {
         upgradeCard.addEventListener('pointerenter', () => upgradeCard.classList.add('hovered'));
         upgradeCard.addEventListener('pointerleave', () => upgradeCard.classList.remove('hovered'));
 
+        // make the upgrade button keep the card hovered while the pointer is over it
+        const upBtn = upgradeCard.querySelector('.upgrade-btn');
+        if (upBtn) {
+            upBtn.addEventListener('pointerenter', () => upgradeCard.classList.add('hovered'));
+            upBtn.addEventListener('pointerleave', (e) => {
+                const related = e.relatedTarget;
+                if (!related || !upgradeCard.contains(related)) {
+                    upgradeCard.classList.remove('hovered');
+                }
+            });
+        }
+
         if (prevHoveredUpgrade && prevHoveredUpgrade === upgrade.id) {
             upgradeCard.classList.add('hovered');
         }
@@ -295,6 +320,18 @@ function updateShopTab() {
         // pointer handlers to keep hover state stable
         shopItem.addEventListener('pointerenter', () => shopItem.classList.add('hovered'));
         shopItem.addEventListener('pointerleave', () => shopItem.classList.remove('hovered'));
+
+        // ensure the shop button also preserves the hovered appearance
+        const shopBtn = shopItem.querySelector('.shop-btn');
+        if (shopBtn) {
+            shopBtn.addEventListener('pointerenter', () => shopItem.classList.add('hovered'));
+            shopBtn.addEventListener('pointerleave', (e) => {
+                const related = e.relatedTarget;
+                if (!related || !shopItem.contains(related)) {
+                    shopItem.classList.remove('hovered');
+                }
+            });
+        }
 
         if (prevHoveredShop && prevHoveredShop === item.id) {
             shopItem.classList.add('hovered');
