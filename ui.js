@@ -168,7 +168,10 @@ function updatePassiveDisplay() {
 
 function updateSkillsTab() {
     const skillsList = document.getElementById('skillsList');
-    // preserve hovered skill key to avoid flicker while rebuilding
+    if (!skillsList) return;
+    // If the user is hovering a card, skip rebuilding to avoid flicker
+    if (skillsList.querySelector('.hovered')) return;
+    // preserve hovered skill key to avoid flicker while rebuilding (unused if returned above)
     const prevHoveredSkill = skillsList.querySelector('.hovered') ? skillsList.querySelector('.hovered').dataset.key : null;
     skillsList.innerHTML = '';
 
@@ -202,7 +205,11 @@ function updateSkillsTab() {
 
         // Use pointer events on the card itself to avoid bubbling flicker
         skillCard.addEventListener('pointerenter', () => skillCard.classList.add('hovered'));
-        skillCard.addEventListener('pointerleave', () => skillCard.classList.remove('hovered'));
+        skillCard.addEventListener('pointerleave', (e) => {
+            skillCard.classList.remove('hovered');
+            // refresh UI after hover ends so state updates are shown
+            try { updateUI(); } catch (err) { }
+        });
 
         // ensure the button inside the card also maintains the hovered state
         const skillBtn = skillCard.querySelector('.skill-btn');
@@ -213,6 +220,7 @@ function updateSkillsTab() {
                 const related = e.relatedTarget;
                 if (!related || !skillCard.contains(related)) {
                     skillCard.classList.remove('hovered');
+                    try { updateUI(); } catch (err) { }
                 }
             });
         }
@@ -232,6 +240,8 @@ function updateSkillsTab() {
 
 function updateUpgradesTab() {
     const upgradesList = document.getElementById('upgradesList');
+    if (!upgradesList) return;
+    if (upgradesList.querySelector('.hovered')) return;
     const prevHoveredUpgrade = upgradesList.querySelector('.hovered') ? upgradesList.querySelector('.hovered').dataset.id : null;
     upgradesList.innerHTML = '';
 
@@ -266,7 +276,10 @@ function updateUpgradesTab() {
 
         // pointer event handlers avoid flicker when moving between children
         upgradeCard.addEventListener('pointerenter', () => upgradeCard.classList.add('hovered'));
-        upgradeCard.addEventListener('pointerleave', () => upgradeCard.classList.remove('hovered'));
+        upgradeCard.addEventListener('pointerleave', (e) => {
+            upgradeCard.classList.remove('hovered');
+            try { updateUI(); } catch (err) { }
+        });
 
         // make the upgrade button keep the card hovered while the pointer is over it
         const upBtn = upgradeCard.querySelector('.upgrade-btn');
@@ -276,6 +289,7 @@ function updateUpgradesTab() {
                 const related = e.relatedTarget;
                 if (!related || !upgradeCard.contains(related)) {
                     upgradeCard.classList.remove('hovered');
+                    try { updateUI(); } catch (err) { }
                 }
             });
         }
@@ -294,6 +308,8 @@ function updateUpgradesTab() {
 
 function updateShopTab() {
     const shopList = document.getElementById('shopList');
+    if (!shopList) return;
+    if (shopList.querySelector('.hovered')) return;
     const prevHoveredShop = shopList.querySelector('.hovered') ? shopList.querySelector('.hovered').dataset.id : null;
     shopList.innerHTML = '';
 
@@ -319,7 +335,10 @@ function updateShopTab() {
 
         // pointer handlers to keep hover state stable
         shopItem.addEventListener('pointerenter', () => shopItem.classList.add('hovered'));
-        shopItem.addEventListener('pointerleave', () => shopItem.classList.remove('hovered'));
+        shopItem.addEventListener('pointerleave', (e) => {
+            shopItem.classList.remove('hovered');
+            try { updateUI(); } catch (err) { }
+        });
 
         // ensure the shop button also preserves the hovered appearance
         const shopBtn = shopItem.querySelector('.shop-btn');
@@ -329,6 +348,7 @@ function updateShopTab() {
                 const related = e.relatedTarget;
                 if (!related || !shopItem.contains(related)) {
                     shopItem.classList.remove('hovered');
+                    try { updateUI(); } catch (err) { }
                 }
             });
         }
