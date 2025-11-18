@@ -394,6 +394,34 @@ function initializeEventListeners() {
             }
         });
     }
+
+    // Stabilize hover visuals for skill/upgrade/shop cards to prevent flicker
+    const stabilizeHover = (containerId) => {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+
+        container.addEventListener('mouseover', (e) => {
+            const card = e.target.closest('.skill-card, .upgrade-card, .shop-item');
+            if (card && container.contains(card)) {
+                card.classList.add('hovered');
+            }
+        });
+
+        container.addEventListener('mouseout', (e) => {
+            const card = e.target.closest('.skill-card, .upgrade-card, .shop-item');
+            if (card && container.contains(card)) {
+                const related = e.relatedTarget;
+                // only remove hovered when the mouse actually left the card
+                if (!related || !card.contains(related)) {
+                    card.classList.remove('hovered');
+                }
+            }
+        });
+    };
+
+    stabilizeHover('skillsList');
+    stabilizeHover('upgradesList');
+    stabilizeHover('shopList');
 }
 
 // ========================================

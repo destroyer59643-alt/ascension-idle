@@ -373,6 +373,16 @@ body {
     transform: translateZ(0);
 }
 
+/* Solid hovered state used by JS to avoid flicker when pointer moves between child elements */
+.skill-card.hovered,
+.upgrade-card.hovered,
+.shop-item.hovered {
+    border-color: var(--primary) !important;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.6) !important;
+    background: var(--bg-tertiary) !important;
+    z-index: 10 !important;
+}
+
 .card-content {
     flex: 1;
 }
