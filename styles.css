@@ -360,7 +360,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    transition: all 0.2s ease;
+    transition: box-shadow 0.18s ease, border-color 0.18s ease, background 0.18s ease;
 }
 
 .skill-card:hover,
@@ -368,6 +368,9 @@ body {
 .shop-item:hover {
     border-color: var(--primary);
     box-shadow: 0 6px 18px rgba(0,0,0,0.6);
+    background: var(--bg-tertiary);
+    z-index: 10;
+    transform: translateZ(0);
 }
 
 .card-content {
@@ -410,8 +413,9 @@ body {
     cursor: pointer;
     font-size: 12px;
     font-weight: 600;
-    transition: all 0.2s ease;
+    transition: background 0.15s ease, box-shadow 0.15s ease, transform 0.08s ease;
     white-space: nowrap;
+    min-width: 68px;
 }
 
 .skill-btn:hover,

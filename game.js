@@ -170,6 +170,10 @@ class IdleGame {
         this.selectedClass = null;
         this.rebirthCount = 0;
         this.rebirthMultiplier = 1;
+        // multiplicative rebirth settings
+        this.rebirthBaseMultiplier = 1.1; // each rebirth multiplies the bonus by this factor
+        this.rebirthRequirementMultiplier = 1.5; // level requirement multiplies by this factor each rebirth
+        this.rebirthLevelRequirement = 10; // required level to perform next rebirth
 
         // Gameplay values
         this.clickXp = 10;
@@ -286,7 +290,8 @@ class IdleGame {
         this.selectedClass = classKey;
         this.initializeClassSkills();
         this.save();
-        this.closeClassModal();
+        // call the global modal closer (defined below) to hide the class modal
+        try { closeClassModal(); } catch (e) { /* ignore if not available */ }
         showNotification(`Selected class: ${CLASSES[classKey].name}`, 'success');
     }
 
@@ -593,11 +598,18 @@ class IdleGame {
     // ========================================
 
     getRebirthMultiplier() {
-        return 1 + (this.rebirthCount * 0.1);
+        // multiplicative rebirth multiplier: base^count
+        return Math.pow(this.rebirthBaseMultiplier || 1.1, this.rebirthCount || 0);
     }
 
     executeRebirth() {
-        // Store multiplier before reset
+        // Require minimum level to rebirth
+        if (this.level < (this.rebirthLevelRequirement || 0)) {
+            showNotification(`You must reach level ${this.rebirthLevelRequirement} to rebirth.`, 'warning');
+            return false;
+        }
+
+        // Increase rebirth count and multiplier
         this.rebirthCount++;
         this.rebirthMultiplier = this.getRebirthMultiplier();
 
@@ -627,7 +639,10 @@ class IdleGame {
         this.showClassSelection();
 
         showNotification(`Rebirth #${this.rebirthCount}! New multiplier: ${this.rebirthMultiplier.toFixed(2)}x`, 'success');
+        // increase requirement for next rebirth multiplicatively
+        this.rebirthLevelRequirement = Math.ceil((this.rebirthLevelRequirement || 10) * (this.rebirthRequirementMultiplier || 1.5));
         this.save();
+        return true;
     }
 
     showClassSelection() {
@@ -648,6 +663,9 @@ class IdleGame {
             selectedClass: this.selectedClass,
             rebirthCount: this.rebirthCount,
             rebirthMultiplier: this.rebirthMultiplier,
+            rebirthLevelRequirement: this.rebirthLevelRequirement,
+            rebirthBaseMultiplier: this.rebirthBaseMultiplier,
+            rebirthRequirementMultiplier: this.rebirthRequirementMultiplier,
             clickXp: this.clickXp,
             passiveXp: this.passiveXp,
             skillMultiplier: this.skillMultiplier,
@@ -674,6 +692,9 @@ class IdleGame {
         this.selectedClass = data.selectedClass;
         this.rebirthCount = data.rebirthCount;
         this.rebirthMultiplier = data.rebirthMultiplier;
+        this.rebirthLevelRequirement = data.rebirthLevelRequirement || this.rebirthLevelRequirement || 10;
+        this.rebirthBaseMultiplier = data.rebirthBaseMultiplier || this.rebirthBaseMultiplier || 1.1;
+        this.rebirthRequirementMultiplier = data.rebirthRequirementMultiplier || this.rebirthRequirementMultiplier || 1.5;
         this.clickXp = data.clickXp;
         this.passiveXp = data.passiveXp;
         this.skillMultiplier = data.skillMultiplier;

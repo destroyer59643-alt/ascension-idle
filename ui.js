@@ -279,6 +279,10 @@ function updateShopTab() {
 function updateRebirthTab() {
     const multiplier = game.getRebirthMultiplier();
     document.getElementById('rebirthMultiplier').textContent = multiplier.toFixed(2) + 'x';
+    const reqEl = document.getElementById('rebirthRequirement');
+    if (reqEl && game.rebirthLevelRequirement) {
+        reqEl.textContent = game.rebirthLevelRequirement;
+    }
 }
 
 // ========================================
@@ -322,6 +326,8 @@ function confirmClassSelection() {
         game.selectClass(selectedClassTemp);
         selectedClassTemp = null;
         document.getElementById('confirmSection').style.display = 'none';
+        // ensure modal closes (in case selectClass didn't hide it)
+        try { closeClassModal(); } catch (e) { /* ignore */ }
     }
 }
 
@@ -379,8 +385,12 @@ function initializeEventListeners() {
     if (rebirthBtn) {
         rebirthBtn.addEventListener('click', () => {
             if (confirm('Are you sure you want to rebirth? This will reset your progress but give you permanent multipliers.')) {
-                game.executeRebirth();
-                updateUI();
+                const success = game.executeRebirth();
+                if (success) {
+                    updateUI();
+                } else {
+                    // failed due to requirements, UI already shows notification
+                }
             }
         });
     }
