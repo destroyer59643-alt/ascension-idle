@@ -204,12 +204,44 @@ function updateSkillsTab() {
         `;
 
         // Use pointer events on the card itself to avoid bubbling flicker
-        skillCard.addEventListener('pointerenter', () => skillCard.classList.add('hovered'));
-        skillCard.addEventListener('pointerleave', (e) => {
-            skillCard.classList.remove('hovered');
-            // refresh UI after hover ends so state updates are shown
-            try { updateUI(); } catch (err) { }
-        });
+            // Use pointer events on the card itself to avoid bubbling flicker
+            // Implement a short debounce/lock so rapid pointer moves don't toggle hovered too fast
+            let hoverTimeout = null;
+            const setHoverState = (on) => {
+                if (hoverTimeout) {
+                    clearTimeout(hoverTimeout);
+                    hoverTimeout = null;
+                }
+                if (on) {
+                    skillCard.classList.add('hovered');
+                } else {
+                    // delay removal slightly to prevent micro-flicker
+                    hoverTimeout = setTimeout(() => {
+                        skillCard.classList.remove('hovered');
+                        hoverTimeout = null;
+                        try { updateUI(); } catch (err) { }
+                    }, 80);
+                }
+            };
+
+            skillCard.addEventListener('pointerenter', () => setHoverState(true));
+            skillCard.addEventListener('pointerleave', (e) => {
+                const related = e.relatedTarget;
+                if (related && skillCard.contains(related)) return; // still inside
+                setHoverState(false);
+            });
+
+            // ensure the button inside the card also maintains the hovered state
+            const skillBtn = skillCard.querySelector('.skill-btn');
+            if (skillBtn) {
+                skillBtn.addEventListener('pointerenter', () => setHoverState(true));
+                skillBtn.addEventListener('pointerleave', (e) => {
+                    const related = e.relatedTarget;
+                    if (!related || !skillCard.contains(related)) {
+                        setHoverState(false);
+                    }
+                });
+            }
 
         // ensure the button inside the card also maintains the hovered state
         const skillBtn = skillCard.querySelector('.skill-btn');
@@ -275,11 +307,23 @@ function updateUpgradesTab() {
         `;
 
         // pointer event handlers avoid flicker when moving between children
-        upgradeCard.addEventListener('pointerenter', () => upgradeCard.classList.add('hovered'));
-        upgradeCard.addEventListener('pointerleave', (e) => {
-            upgradeCard.classList.remove('hovered');
-            try { updateUI(); } catch (err) { }
-        });
+            // pointer event handlers avoid flicker when moving between children
+            let upHoverTimeout = null;
+            const setUpHover = (on) => {
+                if (upHoverTimeout) { clearTimeout(upHoverTimeout); upHoverTimeout = null; }
+                if (on) upgradeCard.classList.add('hovered');
+                else upHoverTimeout = setTimeout(() => { upgradeCard.classList.remove('hovered'); upHoverTimeout = null; try{ updateUI(); }catch(e){} }, 80);
+            };
+
+            upgradeCard.addEventListener('pointerenter', () => setUpHover(true));
+            upgradeCard.addEventListener('pointerleave', (e) => { if (!e.relatedTarget || !upgradeCard.contains(e.relatedTarget)) setUpHover(false); });
+
+            // make the upgrade button keep the card hovered while the pointer is over it
+            const upBtn = upgradeCard.querySelector('.upgrade-btn');
+            if (upBtn) {
+                upBtn.addEventListener('pointerenter', () => setUpHover(true));
+                upBtn.addEventListener('pointerleave', (e) => { if (!e.relatedTarget || !upgradeCard.contains(e.relatedTarget)) setUpHover(false); });
+            }
 
         // make the upgrade button keep the card hovered while the pointer is over it
         const upBtn = upgradeCard.querySelector('.upgrade-btn');
@@ -334,11 +378,23 @@ function updateShopTab() {
         `;
 
         // pointer handlers to keep hover state stable
-        shopItem.addEventListener('pointerenter', () => shopItem.classList.add('hovered'));
-        shopItem.addEventListener('pointerleave', (e) => {
-            shopItem.classList.remove('hovered');
-            try { updateUI(); } catch (err) { }
-        });
+            // pointer handlers to keep hover state stable with a short debounce
+            let shopHoverTimeout = null;
+            const setShopHover = (on) => {
+                if (shopHoverTimeout) { clearTimeout(shopHoverTimeout); shopHoverTimeout = null; }
+                if (on) shopItem.classList.add('hovered');
+                else shopHoverTimeout = setTimeout(() => { shopItem.classList.remove('hovered'); shopHoverTimeout = null; try{ updateUI(); }catch(e){} }, 80);
+            };
+
+            shopItem.addEventListener('pointerenter', () => setShopHover(true));
+            shopItem.addEventListener('pointerleave', (e) => { if (!e.relatedTarget || !shopItem.contains(e.relatedTarget)) setShopHover(false); });
+
+            // ensure the shop button also preserves the hovered appearance
+            const shopBtn = shopItem.querySelector('.shop-btn');
+            if (shopBtn) {
+                shopBtn.addEventListener('pointerenter', () => setShopHover(true));
+                shopBtn.addEventListener('pointerleave', (e) => { if (!e.relatedTarget || !shopItem.contains(e.relatedTarget)) setShopHover(false); });
+            }
 
         // ensure the shop button also preserves the hovered appearance
         const shopBtn = shopItem.querySelector('.shop-btn');
