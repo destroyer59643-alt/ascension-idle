@@ -168,6 +168,8 @@ function updatePassiveDisplay() {
 
 function updateSkillsTab() {
     const skillsList = document.getElementById('skillsList');
+    // preserve hovered skill key to avoid flicker while rebuilding
+    const prevHoveredSkill = skillsList.querySelector('.hovered') ? skillsList.querySelector('.hovered').dataset.key : null;
     skillsList.innerHTML = '';
 
     if (!game.selectedClass) return;
@@ -178,6 +180,7 @@ function updateSkillsTab() {
 
         const skillCard = document.createElement('div');
         skillCard.className = 'skill-card';
+        skillCard.dataset.key = skillName;
 
         let cooldownDisplay = '';
         if (!skill.isReady) {
@@ -201,6 +204,11 @@ function updateSkillsTab() {
         skillCard.addEventListener('pointerenter', () => skillCard.classList.add('hovered'));
         skillCard.addEventListener('pointerleave', () => skillCard.classList.remove('hovered'));
 
+        // restore hovered state if this card was hovered before rebuild
+        if (prevHoveredSkill && prevHoveredSkill === skillName) {
+            skillCard.classList.add('hovered');
+        }
+
         skillsList.appendChild(skillCard);
     });
 }
@@ -211,6 +219,7 @@ function updateSkillsTab() {
 
 function updateUpgradesTab() {
     const upgradesList = document.getElementById('upgradesList');
+    const prevHoveredUpgrade = upgradesList.querySelector('.hovered') ? upgradesList.querySelector('.hovered').dataset.id : null;
     upgradesList.innerHTML = '';
 
     UPGRADES.forEach(upgrade => {
@@ -226,6 +235,7 @@ function updateUpgradesTab() {
 
         const upgradeCard = document.createElement('div');
         upgradeCard.className = 'upgrade-card';
+        upgradeCard.dataset.id = upgrade.id;
 
         upgradeCard.innerHTML = `
             <div class="card-content">
@@ -245,6 +255,10 @@ function updateUpgradesTab() {
         upgradeCard.addEventListener('pointerenter', () => upgradeCard.classList.add('hovered'));
         upgradeCard.addEventListener('pointerleave', () => upgradeCard.classList.remove('hovered'));
 
+        if (prevHoveredUpgrade && prevHoveredUpgrade === upgrade.id) {
+            upgradeCard.classList.add('hovered');
+        }
+
         upgradesList.appendChild(upgradeCard);
     });
 }
@@ -255,6 +269,7 @@ function updateUpgradesTab() {
 
 function updateShopTab() {
     const shopList = document.getElementById('shopList');
+    const prevHoveredShop = shopList.querySelector('.hovered') ? shopList.querySelector('.hovered').dataset.id : null;
     shopList.innerHTML = '';
 
     SHOP_ITEMS.forEach(item => {
@@ -262,6 +277,7 @@ function updateShopTab() {
 
         const shopItem = document.createElement('div');
         shopItem.className = 'shop-item';
+        shopItem.dataset.id = item.id;
 
         shopItem.innerHTML = `
             <div class="card-content">
@@ -279,6 +295,10 @@ function updateShopTab() {
         // pointer handlers to keep hover state stable
         shopItem.addEventListener('pointerenter', () => shopItem.classList.add('hovered'));
         shopItem.addEventListener('pointerleave', () => shopItem.classList.remove('hovered'));
+
+        if (prevHoveredShop && prevHoveredShop === item.id) {
+            shopItem.classList.add('hovered');
+        }
 
         shopList.appendChild(shopItem);
     });
