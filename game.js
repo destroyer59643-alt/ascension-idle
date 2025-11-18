@@ -647,6 +647,8 @@ class IdleGame {
 
     showClassSelection() {
         const modal = document.getElementById('classModal');
+        // Ensure inline display is set so the modal actually appears (clears any prior 'none')
+        modal.style.display = 'flex';
         modal.classList.add('active');
     }
 
@@ -753,7 +755,11 @@ function initGame() {
 }
 
 function closeClassModal() {
-    document.getElementById('classModal').classList.remove('active');
+    const modal = document.getElementById('classModal');
+    if (!modal) return;
+    modal.classList.remove('active');
+    // hide the modal from view so Confirm truly removes it from the screen
+    modal.style.display = 'none';
 }
 
 function showNotification(message, type = 'info') {
