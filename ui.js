@@ -197,6 +197,10 @@ function updateSkillsTab() {
             </div>
         `;
 
+        // Use pointer events on the card itself to avoid bubbling flicker
+        skillCard.addEventListener('pointerenter', () => skillCard.classList.add('hovered'));
+        skillCard.addEventListener('pointerleave', () => skillCard.classList.remove('hovered'));
+
         skillsList.appendChild(skillCard);
     });
 }
@@ -237,6 +241,10 @@ function updateUpgradesTab() {
             </div>
         `;
 
+        // pointer event handlers avoid flicker when moving between children
+        upgradeCard.addEventListener('pointerenter', () => upgradeCard.classList.add('hovered'));
+        upgradeCard.addEventListener('pointerleave', () => upgradeCard.classList.remove('hovered'));
+
         upgradesList.appendChild(upgradeCard);
     });
 }
@@ -267,6 +275,10 @@ function updateShopTab() {
                 </button>
             </div>
         `;
+
+        // pointer handlers to keep hover state stable
+        shopItem.addEventListener('pointerenter', () => shopItem.classList.add('hovered'));
+        shopItem.addEventListener('pointerleave', () => shopItem.classList.remove('hovered'));
 
         shopList.appendChild(shopItem);
     });
@@ -395,33 +407,7 @@ function initializeEventListeners() {
         });
     }
 
-    // Stabilize hover visuals for skill/upgrade/shop cards to prevent flicker
-    const stabilizeHover = (containerId) => {
-        const container = document.getElementById(containerId);
-        if (!container) return;
-
-        container.addEventListener('mouseover', (e) => {
-            const card = e.target.closest('.skill-card, .upgrade-card, .shop-item');
-            if (card && container.contains(card)) {
-                card.classList.add('hovered');
-            }
-        });
-
-        container.addEventListener('mouseout', (e) => {
-            const card = e.target.closest('.skill-card, .upgrade-card, .shop-item');
-            if (card && container.contains(card)) {
-                const related = e.relatedTarget;
-                // only remove hovered when the mouse actually left the card
-                if (!related || !card.contains(related)) {
-                    card.classList.remove('hovered');
-                }
-            }
-        });
-    };
-
-    stabilizeHover('skillsList');
-    stabilizeHover('upgradesList');
-    stabilizeHover('shopList');
+    // NOTE: hover stabilization is applied per-card using pointer events
 }
 
 // ========================================
